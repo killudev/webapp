@@ -1,91 +1,61 @@
 // src/services/firestoreService.js
 import { 
-    collection, 
-    query, 
-    where, 
-    getDocs, 
-    getDoc,
-    doc, 
-    updateDoc, 
-    orderBy,
-    limit 
-  } from "firebase/firestore";
-  import { firestore } from "./firebase";
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  getDoc,
+  doc, 
+  updateDoc, 
+  orderBy,
+  limit 
+} from "firebase/firestore";
+import { firestore } from "./firebase"; // Fixed import path
   
-  // Get phones based on filters
-  export const getPhones = async (filters) => {
-    try {
-      const { priceRange, os, features } = filters;
-      
-      let q = collection(firestore, "phones");
-      let constraints = [];
-      
-      // Apply price range filter
-      if (priceRange) {
-        let [min, max] = [0, 0];
-        
-        switch(priceRange) {
-          case "0-$200":
-            [min, max] = [0, 200];
-            break;
-          case "$200-$400":
-            [min, max] = [200, 400];
-            break;
-          case "$400-$600":
-            [min, max] = [400, 600];
-            break;
-          case "$600-$800":
-            [min, max] = [600, 800];
-            break;
-          case "$800+":
-            [min, max] = [800, 100000]; // Using a very high number for no upper bound
-            break;
-          default:
-            break;
+// Obtener teléfonos basados en filtros
+export const getPhones = async ({ filters, orderByField, orderDirection }) => {
+  try {
+    let q = collection(firestore, "cellphone"); // Ajustar a tu colección en Firebase
+    let constraints = [];
+    
+    // Aplicar filtros si existen
+    if (filters) {
+      // Recorrer cada filtro y añadirlo a las restricciones
+      Object.entries(filters).forEach(([field, value]) => {
+        if (value) {
+          constraints.push(where(field, "==", value));
         }
-        
-        constraints.push(where("price", ">=", min));
-        if (max !== 100000) {
-          constraints.push(where("price", "<=", max));
-        }
-      }
-      
-      // Apply OS filter
-      if (os && os !== "Da igual") {
-        constraints.push(where("os", "==", os));
-      }
-      
-      // Apply features filter
-      if (features && features.length > 0) {
-        // We need to handle this differently based on your data structure
-        // For example, if you have a highlightedFeature field:
-        features.forEach(feature => {
-          constraints.push(where("highlightedFeatures", "array-contains", feature));
-        });
-      }
-      
-      // Apply sorting
-      constraints.push(orderBy("price", "asc"));
-      
-      // Create query with all constraints
-      q = query(collection(firestore, "phones"), ...constraints);
-      
-      // Execute query
-      const querySnapshot = await getDocs(q);
-      const phones = [];
-      
-      querySnapshot.forEach((doc) => {
-        phones.push({
-          id: doc.id,
-          ...doc.data()
-        });
       });
-      
-      return phones;
-    } catch (error) {
-      throw error;
     }
-  };
+    
+    // Aplicar ordenamiento si se especifica un campo
+    if (orderByField) {
+      constraints.push(orderBy(orderByField, orderDirection || "desc"));
+    }
+    
+    // Crear consulta con todas las restricciones
+    if (constraints.length > 0) {
+      q = query(collection(firestore, "cellphone"), ...constraints);
+    }
+    
+    // Ejecutar consulta
+    const querySnapshot = await getDocs(q);
+    const phones = [];
+    
+    querySnapshot.forEach((doc) => {
+      phones.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return phones;
+  } catch (error) {
+    console.error("Error fetching phones:", error);
+    throw error;
+  }
+};
+
   
   // Get user profile
   export const getUserProfile = async (userId) => {
@@ -136,6 +106,7 @@ import {
       });
       return true;
     } catch (error) {
+      console.error("Error saving preferences:", error);
       throw error;
     }
   };

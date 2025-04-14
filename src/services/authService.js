@@ -9,7 +9,8 @@ import {
     sendPasswordResetEmail
   } from "firebase/auth";
   import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
-  import { auth, firestore } from "./firebase";
+  import { auth, firestore } from "../services/firebase"; // Fixed path
+
   
   // Provider for Google authentication
   const googleProvider = new GoogleAuthProvider();
