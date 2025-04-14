@@ -573,9 +573,9 @@ const Home = () => {
           <img src={DEFAULT_BANNER} alt="Banner" style={styles.bannerImage} />
           <div style={styles.userContainer}>
             <div style={styles.userAvatar}>
-              {currentUser?.photoURL ? (
+              {userProfile?.photoURL ? (
                 <img 
-                  src={currentUser.photoURL} 
+                  src={userProfile.photoURL}
                   alt="Profile" 
                   style={styles.profileImage} 
                 />
@@ -588,10 +588,10 @@ const Home = () => {
               )}
             </div>
             <h3 style={styles.userName}>
-              {currentUser?.displayName || "Ricardo Huilipan"}
+              {currentUser?.displayName || "Usuario"}
             </h3>
             <p style={styles.userEmail}>
-              {currentUser?.email || "ricardo.ahuilipan@gmail.com"}
+              {currentUser?.email || ""}
             </p>
           </div>
         </div>
@@ -660,19 +660,20 @@ const Home = () => {
             style={styles.menuButton} 
             onClick={toggleSideMenu}
           >
-            {currentUser?.photoURL ? (
+            {userProfile?.photoURL ? (
               <img 
-                src={currentUser.photoURL} 
+                src={userProfile.photoURL} 
                 alt="Profile" 
                 style={styles.profileImage} 
               />
             ) : (
               <span style={styles.profileInitial}>
-                {currentUser?.displayName
-                  ? currentUser.displayName.charAt(0).toUpperCase()
+                {userProfile?.displayName
+                  ? userProfile.displayName.charAt(0).toUpperCase()
                   : "R"}
               </span>
             )}
+
           </button>
           
           <div style={styles.logoContainer}>
